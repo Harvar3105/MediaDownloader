@@ -21,3 +21,8 @@ MediaDownloader
   Agents.md
   Readme.md
   .gitignore
+
+## Code Generation Rules
+
+Do not write XML docummentations
+Do not write comments

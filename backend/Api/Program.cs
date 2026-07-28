@@ -1,3 +1,4 @@
+using MediaDownloader.Application;
 using MediaDownloader.Youtube;
 
 var webRootPath = Path.GetFullPath(
@@ -16,6 +17,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<YoutubeDownloader>();
+builder.Services.AddScoped<YtdlpController>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

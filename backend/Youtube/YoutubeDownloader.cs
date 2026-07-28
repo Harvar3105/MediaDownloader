@@ -1,62 +1,49 @@
 ﻿namespace MediaDownloader.Youtube;
 
+using MediaDownloader.Application;
 using MediaDownloader.Domain.Classes;
 using MediaDownloader.Domain.Enums;
-using VideoLibrary;
-using Vid = Domain.Classes.Video;
+using Microsoft.Extensions.Logging;
 
 public class YoutubeDownloader
 {
-  private readonly YouTube _downloader = YouTube.Default;
-  public async Task<Vid> GetVideo(string link, EVideoResolution resolution)
-  {
-    var streams = await _downloader.GetAllVideosAsync(link);
-    var video = streams.FirstOrDefault(v => v.Resolution == (int) resolution);
-    if (video == null)
-    {
-      throw new ArgumentException($"Video with resolution {resolution} not found.");
-    }
-    
-    var metadata = new MediaMetadata
-    {
-      Title = video.Title,
-      Author = video.Info.Author,
-      FullName = video.FullName,
-      FileSize = video.ContentLength,
-    };
+  private readonly YtdlpController _downloader;
+  private readonly string[] NecessaryArguments = new[] { "-q", "-o", "-", "--js-runtime", "node" };
+  private readonly ILogger<YoutubeDownloader> _logger;
 
-    return new Vid
-    {
-      Metadata = metadata,
-      DurationSec = video.Info.LengthSeconds,
-      Extension = EnumHelpers.GetVideoExtension(video.FileExtension),
-      Resolution = (EVideoResolution) video.Resolution,
-      Content = await video.GetBytesAsync(),
-    };
+  public YoutubeDownloader(ILogger<YoutubeDownloader> logger, YtdlpController downloader)
+  {
+    _logger = logger;
+    _downloader = downloader;
   }
 
-  public async Task<Audio> GetAudio(string link)
+  public async Task<Video> GetVideoAsync(string link, EVideoResolution resolution)
   {
-    var streams = await _downloader.GetAllVideosAsync(link);
-    var audio = streams.First(s => s.AdaptiveKind == AdaptiveKind.Audio);
-    if (audio == null)
-    {
-      throw new ArgumentException($"Audio not found.");
-    }
+    string[] streamParams = ["-S", $"res:{(int) resolution}", link];
+    var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
 
-    return new Audio
+    var metadataPayload = await _downloader.RunAsync(arguments: new[] {
+      "--skip-download", "--print", "%(title)s|%(ext)s|%(uploader)s|%(duration)s|%(filesize,filesize_approx)s|%(height)s", }
+      .Concat(streamParams).ToArray());
+    var metadataParts = metadataPayload.StandardOutput.Split('|');
+
+    var metadata = new MediaMetadata
     {
-      Metadata = new MediaMetadata
-      {
-        Title = audio.Title,
-        Author = audio.Info.Author,
-        FullName = audio.FullName,
-        FileSize = audio.ContentLength,
-      },
-      Extension = EnumHelpers.GetAudioExtension(audio.FileExtension),
-      DurationSec = audio.Info.LengthSeconds,
-      Bitrate = audio.AudioBitrate,
-      Content = audio.GetBytes(),
+      Title = metadataParts[0],
+      FullName = $"{metadataParts[0]}.{metadataParts[1]}",
+      Author = metadataParts[2],
+      FileSize = long.Parse(metadataParts[4]),
+    };
+
+    _logger.LogInformation($"Successfully got info for: {metadata.Title}");
+
+    return new Video
+    {
+      Metadata = metadata,
+      Extension = EnumHelpers.GetVideoExtension(metadataParts[1]),
+      Content = videoBytes,
+      DurationSec = int.Parse(metadataParts[3]),
+      Resolution = (EVideoResolution) int.Parse(metadataParts[5]),
     };
   }
 }
