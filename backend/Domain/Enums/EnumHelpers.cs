@@ -54,9 +54,9 @@ public static class EnumHelpers
   {
     return extension.Trim().ToLower() switch
     {
-      "mp3" => EAudioExtension.Mp3,
-      "mp4" => EAudioExtension.Mp4,
-      "wav" => EAudioExtension.Wav,
+      "mp3" => EAudioExtension.mp3,
+      "mp4" => EAudioExtension.mp4,
+      "wav" => EAudioExtension.wav,
       _ => throw new ArgumentException($"Unknown audio extension: {extension}")
     };
   }
@@ -65,9 +65,9 @@ public static class EnumHelpers
   {
     return extension switch
     {
-      EAudioExtension.Mp3 => "mp3",
-      EAudioExtension.Mp4 => "mp4",
-      EAudioExtension.Wav => "wav",
+      EAudioExtension.mp3 => "mp3",
+      EAudioExtension.mp4 => "mp4",
+      EAudioExtension.wav => "wav",
       _ => throw new ArgumentException($"Unknown audio extension: {extension}")
     };
   }

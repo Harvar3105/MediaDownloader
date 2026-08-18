@@ -28,4 +28,18 @@ public class YoutubeController : ControllerBase
       return BadRequest(ex.Message);
     }
   }
+
+  [HttpGet("audio")]
+  public async Task<IActionResult> GetAudio(string link, EAudioExtension format = EAudioExtension.mp3)
+  {
+    try
+    {
+      var audio = await _downloader.GetAudioAsync(link, format);
+      return File(audio.Content, "application/octet-stream", audio.Metadata.FullName);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
+  }
 }

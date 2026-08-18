@@ -2,7 +2,7 @@ namespace MediaDownloader.Domain.Enums;
 
 public enum EAudioExtension
 {
-  Mp3,
-  Mp4,
-  Wav,
+  mp3 = 0,
+  mp4 = 1,
+  wav = 2,
 }

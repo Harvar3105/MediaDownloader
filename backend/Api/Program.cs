@@ -1,5 +1,6 @@
 using MediaDownloader.Application;
 using MediaDownloader.Youtube;
+using System.Text.Json.Serialization;
 
 var webRootPath = Path.GetFullPath(
   Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "wwwroot")
@@ -11,7 +12,11 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
   WebRootPath = webRootPath,
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+  .AddJsonOptions(options =>
+  {
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+  });
 builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen();
