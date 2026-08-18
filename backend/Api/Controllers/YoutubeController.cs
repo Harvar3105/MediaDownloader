@@ -30,7 +30,7 @@ public class YoutubeController : ControllerBase
   }
 
   [HttpGet("audio")]
-  public async Task<IActionResult> GetAudio(string link, EAudioExtension format = EAudioExtension.mp3)
+  public async Task<IActionResult> GetAudio(string link, EAudioExtension format = EAudioExtension.Mp3)
   {
     try
     {

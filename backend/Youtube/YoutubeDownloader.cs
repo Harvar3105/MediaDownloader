@@ -41,7 +41,7 @@ public class YoutubeDownloader
     return new Video
     {
       Metadata = metadata,
-      Extension = EnumHelpers.GetVideoExtension(metadataParts[1]),
+      Extension = Enum.Parse<EVideoExtension>(metadataParts[1].Trim(), ignoreCase: true),
       Content = videoBytes,
       DurationSec = int.Parse(metadataParts[3]),
       Resolution = (EVideoResolution) int.Parse(metadataParts[5]),
@@ -50,7 +50,7 @@ public class YoutubeDownloader
 
   public async Task<Audio> GetAudioAsync(string link, EAudioExtension format)
   {
-    string[] streamParams = ["-f", format.ToString(), link];
+    string[] streamParams = ["-f", format.ToString().ToLower(), link];
     var audioBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
 
     var metadataPayload = await _downloader.RunAsync(arguments: new[] {
@@ -73,7 +73,7 @@ public class YoutubeDownloader
     {
       Metadata = metadata,
       Bitrate = float.Parse(metadataParts[5], CultureInfo.InvariantCulture),
-      Extension = EnumHelpers.GetAudioExtension(metadataParts[1]),
+      Extension = Enum.Parse<EAudioExtension>(metadataParts[1].Trim(), ignoreCase: true),
       Content = audioBytes,
       DurationSec = int.Parse(metadataParts[3]),
     };
