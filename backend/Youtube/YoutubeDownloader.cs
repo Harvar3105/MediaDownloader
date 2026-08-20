@@ -18,22 +18,22 @@ public class YoutubeDownloader
     _downloader = downloader;
   }
 
-  public async Task<Video> GetVideoAsync(string link, EVideoResolution resolution)
+  public async Task<Video> GetVideoAsync(string link, EVideoResolution resolution, EVideoExtension format)
   {
-    string[] streamParams = ["-S", $"res:{(int) resolution}", link];
+    string[] streamParams = ["-S", $"res:{(int) resolution}", link, "--remux-video", format.ToString().ToLower()];
     var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
-
+    _logger.LogInformation($"Successfully downloaded video with resolution {resolution} and format {format}");
     var metadataPayload = await _downloader.RunAsync(arguments: new[] {
-      "--skip-download", "--print", "%(title)s|%(ext)s|%(uploader)s|%(duration)s|%(filesize,filesize_approx)s|%(height)s", }
+      "--skip-download", "--print", "%(title)s|%(uploader)s|%(duration)s|%(filesize,filesize_approx)s|%(height)s", }
       .Concat(streamParams).ToArray());
     var metadataParts = metadataPayload.StandardOutput.Trim().Split('|');
 
     var metadata = new MediaMetadata
     {
       Title = metadataParts[0],
-      FullName = $"{metadataParts[0]}.{metadataParts[1]}",
-      Author = metadataParts[2],
-      FileSize = long.Parse(metadataParts[4]),
+      FullName = $"{metadataParts[0]}.{format.ToString().ToLower()}",
+      Author = metadataParts[1],
+      FileSize = long.Parse(metadataParts[3]),
     };
 
     _logger.LogInformation($"Successfully got info for: {metadata.Title}");
@@ -41,10 +41,10 @@ public class YoutubeDownloader
     return new Video
     {
       Metadata = metadata,
-      Extension = Enum.Parse<EVideoExtension>(metadataParts[1].Trim(), ignoreCase: true),
+      Extension = format,
       Content = videoBytes,
-      DurationSec = int.Parse(metadataParts[3]),
-      Resolution = (EVideoResolution) int.Parse(metadataParts[5]),
+      DurationSec = int.Parse(metadataParts[2]),
+      Resolution = (EVideoResolution) int.Parse(metadataParts[4]),
     };
   }
 

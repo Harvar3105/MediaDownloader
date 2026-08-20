@@ -16,11 +16,11 @@ public class YoutubeController : ControllerBase
   }
 
   [HttpGet("video")]
-  public async Task<IActionResult> GetVideo(string link, EVideoResolution resolution = EVideoResolution.P720)
+  public async Task<IActionResult> GetVideo(string link, EVideoResolution resolution = EVideoResolution.P720, EVideoExtension format = EVideoExtension.Mp4)
   {
     try
     {
-      var video = await _downloader.GetVideoAsync(link, resolution);
+      var video = await _downloader.GetVideoAsync(link, resolution, format);
       return File(video.Content, "application/octet-stream", video.Metadata.FullName);
     }
     catch (Exception ex)
