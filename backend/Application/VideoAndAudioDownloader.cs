@@ -106,7 +106,23 @@ public class VideoAndAudioDownloader
   {
     string[] streamParams = ["-S", $"res:{(int) resolution}", link, "--remux-video", format.ToString().ToLower()];
     var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
-    _logger.LogInformation($"Successfully downloaded video with resolution {resolution} and format {format}");
+
+    var metadata = await GetMediaMetadataAsync(link, format.ToString());
+
+    return new VideoFile
+    {
+      Metadata = metadata,
+      Extension = format,
+      Content = videoBytes,
+      Resolution = resolution,
+    };
+  }
+
+  public async Task<VideoFile> GetVideoByIdAsync(string link, string id, EVideoResolution resolution, EVideoExtension format)
+  {
+    string[] streamParams = ["-f", id, link, "--remux-video", format.ToString().ToLower()];
+
+    var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
 
     var metadata = await GetMediaMetadataAsync(link, format.ToString());
 
@@ -124,16 +140,27 @@ public class VideoAndAudioDownloader
     string[] streamParams = ["-f", format.ToString().ToLower(), link];
     var audioBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
 
-    var metadataPayload = await _downloader.RunAsync(arguments: new[] {
-      "--skip-download", "--print", "%(title)s|%(ext)s|%(uploader)s|%(duration)s|%(filesize,filesize_approx)s|%(tbr)s", }
-      .Concat(streamParams).ToArray());
-    var metadataParts = metadataPayload.StandardOutput.Trim().Split('|');
+    var metadata = await GetMediaMetadataAsync(link, format.ToString());
+
+    return new AudioFile
+    {
+      Metadata = metadata,
+      Extension = format,
+      Content = audioBytes,
+    };
+  }
+
+  public async Task<AudioFile> GetAudioByIdAsync(string link, string id, EAudioExtension format)
+  {
+    string[] streamParams = ["-f", id, link];
+    var audioBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
 
     var metadata = await GetMediaMetadataAsync(link, format.ToString());
 
     return new AudioFile
     {
-      Metadata = metadata,      Extension = Enum.Parse<EAudioExtension>(metadataParts[1].Trim(), ignoreCase: true),
+      Metadata = metadata,
+      Extension = format,
       Content = audioBytes,
     };
   }
