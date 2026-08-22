@@ -86,33 +86,36 @@ public class VideoAndAudioDownloader
     };
   }
 
+  public async Task<MediaMetadata> GetMediaMetadataAsync(string link, string format)
+  {
+    var metadataPayload = await _downloader.RunAsync(arguments: new[] {
+      "--skip-download", "--print", "%(title)s|%(uploader)s|%(duration)s|%(filesize,filesize_approx)s", link });
+    var metadataParts = metadataPayload.StandardOutput.Trim().Split('|');
+
+    return new MediaMetadata
+    {
+      Title = metadataParts[0],
+      Author = metadataParts[1],
+      FullName = $"{metadataParts[0]}.{format.ToString().ToLower()}",
+      FileSize = long.Parse(metadataParts[3]),
+      DurationSec = int.Parse(metadataParts[2])
+    };
+  }
+
   public async Task<VideoFile> GetVideoAsync(string link, EVideoResolution resolution, EVideoExtension format)
   {
     string[] streamParams = ["-S", $"res:{(int) resolution}", link, "--remux-video", format.ToString().ToLower()];
     var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
     _logger.LogInformation($"Successfully downloaded video with resolution {resolution} and format {format}");
-    var metadataPayload = await _downloader.RunAsync(arguments: new[] {
-      "--skip-download", "--print", "%(title)s|%(uploader)s|%(duration)s|%(filesize,filesize_approx)s|%(height)s", }
-      .Concat(streamParams).ToArray());
-    var metadataParts = metadataPayload.StandardOutput.Trim().Split('|');
 
-    var metadata = new MediaMetadata
-    {
-      Title = metadataParts[0],
-      FullName = $"{metadataParts[0]}.{format.ToString().ToLower()}",
-      Author = metadataParts[1],
-      FileSize = long.Parse(metadataParts[3]),
-    };
-
-    _logger.LogInformation($"Successfully got info for: {metadata.Title}");
+    var metadata = await GetMediaMetadataAsync(link, format.ToString());
 
     return new VideoFile
     {
       Metadata = metadata,
       Extension = format,
       Content = videoBytes,
-      DurationSec = int.Parse(metadataParts[2]),
-      Resolution = (EVideoResolution) int.Parse(metadataParts[4]),
+      Resolution = resolution,
     };
   }
 
@@ -126,24 +129,12 @@ public class VideoAndAudioDownloader
       .Concat(streamParams).ToArray());
     var metadataParts = metadataPayload.StandardOutput.Trim().Split('|');
 
-    var metadata = new MediaMetadata
-    {
-      Title = metadataParts[0],
-      FullName = $"{metadataParts[0]}.{metadataParts[1]}",
-      Author = metadataParts[2],
-      FileSize = long.Parse(metadataParts[4]),
-    };
-
-    _logger.LogInformation($"Successfully got info for: {metadata.Title}");
-    _logger.LogInformation($"Parts: {String.Join(" | ", metadataParts) + "END"}");
+    var metadata = await GetMediaMetadataAsync(link, format.ToString());
 
     return new AudioFile
     {
-      Metadata = metadata,
-      Bitrate = float.Parse(metadataParts[5], CultureInfo.InvariantCulture),
-      Extension = Enum.Parse<EAudioExtension>(metadataParts[1].Trim(), ignoreCase: true),
+      Metadata = metadata,      Extension = Enum.Parse<EAudioExtension>(metadataParts[1].Trim(), ignoreCase: true),
       Content = audioBytes,
-      DurationSec = int.Parse(metadataParts[3]),
     };
   }
 }

@@ -6,4 +6,5 @@ public class MediaMetadata
   public required string FullName { get; set; }
   public string? Author { get; set; }
   public long? FileSize { get; set; }
+  public int DurationSec { get; set; }
 }
