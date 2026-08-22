@@ -2,7 +2,7 @@ using MediaDownloader.Domain.Enums;
 
 namespace MediaDownloader.Domain.Classes;
 
-public class Video : AbstractMediaFile
+public class VideoFile : AbstractMediaFile
 {
   public required EVideoExtension Extension { get; set; }
   public required int DurationSec { get; set; }

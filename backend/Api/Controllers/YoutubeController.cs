@@ -9,10 +9,12 @@ namespace MediaDownloader.Api.Controllers;
 public class YoutubeController : ControllerBase
 {
   private VideoAndAudioDownloader _downloader;
+  private readonly ILogger<YoutubeController> _logger;
 
-  public YoutubeController(VideoAndAudioDownloader downloader)
+  public YoutubeController(VideoAndAudioDownloader downloader, ILogger<YoutubeController> logger)
   {
     _downloader = downloader;
+    _logger = logger;
   }
 
   [HttpGet("video")]
@@ -39,6 +41,21 @@ public class YoutubeController : ControllerBase
     }
     catch (Exception ex)
     {
+      return BadRequest(ex.Message);
+    }
+  }
+
+  [HttpGet("streams_info")]
+  public async Task<IActionResult> GetStreamsInfo(string link)
+  {
+    try
+    {
+      var streamsInfo = await _downloader.GetStreamsInfoAsync(link);
+      return Ok(streamsInfo);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError($"Error getting streams info: {ex.Message}");
       return BadRequest(ex.Message);
     }
   }
