@@ -1,5 +1,5 @@
+using MediaDownloader.Application;
 using MediaDownloader.Domain.Enums;
-using MediaDownloader.Youtube;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediaDownloader.Api.Controllers;
@@ -8,9 +8,9 @@ namespace MediaDownloader.Api.Controllers;
 [Route("api/[controller]")]
 public class YoutubeController : ControllerBase
 {
-  private YoutubeDownloader _downloader;
+  private VideoAndAudioDownloader _downloader;
 
-  public YoutubeController(YoutubeDownloader downloader)
+  public YoutubeController(VideoAndAudioDownloader downloader)
   {
     _downloader = downloader;
   }

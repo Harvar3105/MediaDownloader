@@ -1,18 +1,18 @@
-﻿namespace MediaDownloader.Youtube;
+﻿namespace MediaDownloader.Application;
 
 using System.Globalization;
-using MediaDownloader.Application;
 using MediaDownloader.Domain.Classes;
 using MediaDownloader.Domain.Enums;
+using MediaDownloader.Runners;
 using Microsoft.Extensions.Logging;
 
-public class YoutubeDownloader
+public class VideoAndAudioDownloader
 {
   private readonly YtdlpController _downloader;
   private readonly string[] NecessaryArguments = new[] { "-q", "-o", "-", "--js-runtime", "node" };
-  private readonly ILogger<YoutubeDownloader> _logger;
+  private readonly ILogger<VideoAndAudioDownloader> _logger;
 
-  public YoutubeDownloader(ILogger<YoutubeDownloader> logger, YtdlpController downloader)
+  public VideoAndAudioDownloader(ILogger<VideoAndAudioDownloader> logger, YtdlpController downloader)
   {
     _logger = logger;
     _downloader = downloader;

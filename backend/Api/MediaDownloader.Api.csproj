@@ -13,8 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\MediaDownloader.Application.csproj" />
     <ProjectReference Include="..\Domain\MediaDownloader.Domain.csproj" />
-    <ProjectReference Include="..\Youtube\MediaDownloader.Youtube.csproj" />
+    <ProjectReference Include="..\Runners\MediaDownloader.Runners.csproj" />
   </ItemGroup>
 
 </Project>

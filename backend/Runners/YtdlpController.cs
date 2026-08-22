@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace MediaDownloader.Application;
+namespace MediaDownloader.Runners;
 
 public sealed class YtdlpController
 {
