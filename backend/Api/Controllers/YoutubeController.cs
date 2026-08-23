@@ -59,4 +59,46 @@ public class YoutubeController : ControllerBase
       return BadRequest(ex.Message);
     }
   }
+
+  [HttpGet("get_mdedia_metadata")]
+  public async Task<IActionResult> GetMediaMetadata(string link, string format)
+  {
+    try
+    {
+      var metadata = await _downloader.GetMediaMetadataAsync(link, format);
+      return Ok(metadata);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError($"Error getting media metadata: {ex.Message}");
+      return BadRequest(ex.Message);
+    }
+  }
+
+  [HttpGet("video_by_id")]
+  public async Task<IActionResult> GetVideoById(string link, string id, EVideoResolution resolution, EVideoExtension format)
+  {
+    try
+    {
+      var video = await _downloader.GetVideoByIdAsync(link, id, resolution, format);
+      return File(video.Content, "application/octet-stream", video.Metadata.FullName);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
+  }
+
+  public async Task<IActionResult> GetAudioById(string link, string id, EAudioExtension format)
+  {
+    try
+    {
+      var audio = await _downloader.GetAudioByIdAsync(link, id, format);
+      return File(audio.Content, "application/octet-stream", audio.Metadata.FullName);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
+  }
 }
