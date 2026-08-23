@@ -89,5 +89,5 @@ Desktop.ini
 *~
 
 # --- User Added ---
-.release
-*.wwwroot
+/release/
+**/wwwroot/
