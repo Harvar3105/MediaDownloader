@@ -9,7 +9,7 @@
 
 ### Publishing command
 
-1) Run build
+1. Run build
 
 ```language bash
 cd frontend
@@ -17,10 +17,10 @@ npm run build
 cd ..
 ```
 
-2) Publsh exe
+2. Publsh exe
 
 ```language bash
 dotnet publish .\backend\Api\MediaDownloader.Api.csproj  -c Release  -r win-x64  --self-contained true  -p:PublishSingleFile=true  -p:IncludeNativeLibrariesForSelfExtract=true -o .\release
 ```
 
-3)
+3. Find release exe in `release` folder

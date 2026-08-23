@@ -6,12 +6,12 @@ namespace MediaDownloader.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class YoutubeController : ControllerBase
+public class VideoAndAudioController : ControllerBase
 {
   private VideoAndAudioDownloader _downloader;
-  private readonly ILogger<YoutubeController> _logger;
+  private readonly ILogger<VideoAndAudioController> _logger;
 
-  public YoutubeController(VideoAndAudioDownloader downloader, ILogger<YoutubeController> logger)
+  public VideoAndAudioController(VideoAndAudioDownloader downloader, ILogger<VideoAndAudioController> logger)
   {
     _downloader = downloader;
     _logger = logger;
