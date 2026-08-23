@@ -87,3 +87,7 @@ Desktop.ini
 *.swp
 *.swo
 *~
+
+# --- User Added ---
+.release
+*.wwwroot

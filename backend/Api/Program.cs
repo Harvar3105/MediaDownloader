@@ -2,15 +2,7 @@ using MediaDownloader.Application;
 using MediaDownloader.Runners;
 using System.Text.Json.Serialization;
 
-var webRootPath = Path.GetFullPath(
-  Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "wwwroot")
-);
-
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-{
-  Args = args,
-  WebRootPath = webRootPath,
-});
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
   .AddJsonOptions(options =>

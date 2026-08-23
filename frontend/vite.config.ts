@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss()
   ],
   build: {
-    outDir: '../backend/wwwroot',
+    outDir: '../backend/Api/wwwroot',
     emptyOutDir: true,
   }
 })
