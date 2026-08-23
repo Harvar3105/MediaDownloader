@@ -89,6 +89,7 @@ public class YoutubeController : ControllerBase
     }
   }
 
+  [HttpGet("audio_by_id")]
   public async Task<IActionResult> GetAudioById(string link, string id, EAudioExtension format)
   {
     try
