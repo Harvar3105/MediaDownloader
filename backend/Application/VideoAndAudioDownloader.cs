@@ -120,7 +120,7 @@ public class VideoAndAudioDownloader
 
   public async Task<VideoFile> GetVideoByIdAsync(string link, string id, EVideoResolution resolution, EVideoExtension format)
   {
-    string[] streamParams = ["-f", id, link, "--remux-video", format.ToString().ToLower()];
+    string[] streamParams = ["-f", $"{id}+bestaudio", link, "--remux-video", format.ToString().ToLower()];
 
     var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
 
