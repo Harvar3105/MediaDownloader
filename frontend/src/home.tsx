@@ -51,14 +51,14 @@ export default function Home() {
       const response = await fetch(`${apiUrl}/api/VideoAndAudio/${mediaKind}?${parameters}`)
 
       if (!response.ok) {
-        throw new Error((await response.text()) || 'Не удалось подготовить файл.')
+        throw new Error((await response.text()) || 'Could not prepare a file.')
       }
 
       const blob = await response.blob()
       setFileName(getFileName(response.headers.get('content-disposition'), `media.${parameters.get('format')?.toLowerCase()}`))
       setDownloadUrl(URL.createObjectURL(blob))
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Не удалось отправить запрос.')
+      setError(requestError instanceof Error ? requestError.message : 'Could not send a request.')
     } finally {
       setIsLoading(false)
     }

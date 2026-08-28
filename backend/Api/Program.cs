@@ -1,6 +1,6 @@
+using System.Text.Json.Serialization;
 using MediaDownloader.Application;
 using MediaDownloader.Runners;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +15,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-  options.AddDefaultPolicy(policy => policy.WithOrigins("http://localhost:5173", "https://localhost:5173"));
+  options.AddDefaultPolicy(policy => policy.WithOrigins(
+    "http://localhost:5173",
+    "https://localhost:5173",
+    "http://localhost:5003",
+    "http://127.0.0.1:5003",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000"));
 });
 
 builder.Services.AddScoped<VideoAndAudioDownloader>();

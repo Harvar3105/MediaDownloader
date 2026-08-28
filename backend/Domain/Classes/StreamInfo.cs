@@ -4,7 +4,7 @@ namespace MediaDownloader.Domain.Classes;
 
 public class StreamInfo
 {
-  public string Id { get; set; }  = null!;
+  public string Id { get; set; } = null!;
   public EVideoExtension VideoExtension { get; set; }
   public string Resolution { get; set; } = null!;
   public string AudioCodec { get; set; } = null!;

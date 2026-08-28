@@ -1,4 +1,4 @@
-﻿namespace MediaDownloader.Application;
+namespace MediaDownloader.Application;
 
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -80,9 +80,9 @@ public class VideoAndAudioDownloader
 
     return match.Groups["unit"].Value.ToLowerInvariant() switch
     {
-      "m" => (long) Math.Round(bitrate * 1000),
-      "g" => (long) Math.Round(bitrate * 1_000_000),
-      _ => (long) Math.Round(bitrate),
+      "m" => (long)Math.Round(bitrate * 1000),
+      "g" => (long)Math.Round(bitrate * 1_000_000),
+      _ => (long)Math.Round(bitrate),
     };
   }
 
@@ -104,7 +104,7 @@ public class VideoAndAudioDownloader
 
   public async Task<VideoFile> GetVideoAsync(string link, EVideoResolution resolution, EVideoExtension format)
   {
-    string[] streamParams = ["-S", $"res:{(int) resolution}", link, "--remux-video", format.ToString().ToLower()];
+    string[] streamParams = ["-S", $"res:{(int)resolution}", link, "--remux-video", format.ToString().ToLower()];
     var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
 
     var metadata = await GetMediaMetadataAsync(link, format.ToString());

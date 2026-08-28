@@ -21,6 +21,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaDownloader.Application", "backend\Application\MediaDownloader.Application.csproj", "{2DB7B738-3D4D-4734-A875-8C7A2EF58C5B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{7A1224A0-F22D-34FF-DE0A-A058FAFFD90C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaDownloader.Desktop", "Desktop\MediaDownloader.Desktop.csproj", "{172CB92A-66E8-47A3-83A3-05E059F9FDF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +83,18 @@ Global
 		{2DB7B738-3D4D-4734-A875-8C7A2EF58C5B}.Release|x64.Build.0 = Release|Any CPU
 		{2DB7B738-3D4D-4734-A875-8C7A2EF58C5B}.Release|x86.ActiveCfg = Release|Any CPU
 		{2DB7B738-3D4D-4734-A875-8C7A2EF58C5B}.Release|x86.Build.0 = Release|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Debug|x64.Build.0 = Debug|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Debug|x86.Build.0 = Debug|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Release|x64.ActiveCfg = Release|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Release|x64.Build.0 = Release|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Release|x86.ActiveCfg = Release|Any CPU
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,5 +108,6 @@ Global
 		{C5DE01F0-76E1-4EE8-A35E-A2BE80B526E8} = {71FEF636-B4C0-04BE-5097-74DAD1153679}
 		{33FD244D-51BC-CAC7-0C9F-80EE60BF9967} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
 		{2DB7B738-3D4D-4734-A875-8C7A2EF58C5B} = {33FD244D-51BC-CAC7-0C9F-80EE60BF9967}
+		{172CB92A-66E8-47A3-83A3-05E059F9FDF9} = {7A1224A0-F22D-34FF-DE0A-A058FAFFD90C}
 	EndGlobalSection
 EndGlobal

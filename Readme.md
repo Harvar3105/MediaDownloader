@@ -21,6 +21,11 @@ cd ..
 
 ```language bash
 dotnet publish .\backend\Api\MediaDownloader.Api.csproj  -c Release  -r win-x64  --self-contained true  -p:PublishSingleFile=true  -p:IncludeNativeLibrariesForSelfExtract=true -o .\release
+
+dotnet publish .\backend\Api\MediaDownloader.Api.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:IncludeAllContentForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o .\release
+
+npm --prefix frontend run build
+dotnet publish Desktop/MediaDownloader.Desktop.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:IncludeAllContentForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o release
 ```
 
 3. Find release exe in `release` folder
