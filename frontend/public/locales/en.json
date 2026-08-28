@@ -1,0 +1,19 @@
+{
+  "pageTitle": "Media Downloader",
+  "downloadMedia": "Download media",
+  "description": "Paste a link, choose an available stream, and prepare the file for download.",
+  "mediaLink": "Media link",
+  "fetchStreams": "Get available formats",
+  "fetchingStreams": "Getting formats…",
+  "selectFormat": "Select a format",
+  "audio": "Audio",
+  "video": "Video",
+  "prepareFile": "Prepare file",
+  "preparingFile": "Preparing file…",
+  "downloadFile": "Download file",
+  "fetchStreamsError": "Unable to get the available formats.",
+  "noStreamsError": "No available formats were found for this link.",
+  "prepareFileError": "Unable to prepare the file.",
+  "requestError": "Unable to send the request.",
+  "language": "Language"
+}

@@ -1,0 +1,19 @@
+{
+  "pageTitle": "Media Downloader",
+  "downloadMedia": "Скачать медиафайл",
+  "description": "Вставьте ссылку, выберите доступный поток и подготовьте файл для скачивания.",
+  "mediaLink": "Ссылка на медиа",
+  "fetchStreams": "Получить доступные форматы",
+  "fetchingStreams": "Получаем форматы…",
+  "selectFormat": "Выберите формат",
+  "audio": "Аудио",
+  "video": "Видео",
+  "prepareFile": "Подготовить файл",
+  "preparingFile": "Подготавливаем файл…",
+  "downloadFile": "Скачать файл",
+  "fetchStreamsError": "Не удалось получить доступные форматы.",
+  "noStreamsError": "Для этой ссылки не найдены доступные форматы.",
+  "prepareFileError": "Не удалось подготовить файл.",
+  "requestError": "Не удалось отправить запрос.",
+  "language": "Язык"
+}
