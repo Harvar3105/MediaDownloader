@@ -5,7 +5,7 @@ namespace MediaDownloader.Domain.Classes;
 public class StreamInfo
 {
   public string Id { get; set; } = null!;
-  public EVideoExtension VideoExtension { get; set; }
+  public EExtension Extension { get; set; } //Video Extension also contains all available audio extension. yt-dlp cpecific
   public string Resolution { get; set; } = null!;
   public string AudioCodec { get; set; } = null!;
   public string VideoCodec { get; set; } = null!;
@@ -15,6 +15,6 @@ public class StreamInfo
 
   public override string ToString()
   {
-    return $"{Id}\t{VideoExtension}\t{Resolution}\t|\t{TotalBitrate}\t|\t{VideoCodec}\t{VideoBitrate}\t|\t{AudioCodec}\t{AudioBitrate}";
+    return $"{Id}\t{Extension}\t{Resolution}\t|\t{TotalBitrate}\t|\t{VideoCodec}\t{VideoBitrate}\t|\t{AudioCodec}\t{AudioBitrate}";
   }
 }

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using MediaDownloader.Domain.Classes;
 using MediaDownloader.Domain.Enums;
+using MediaDownloader.Infrastructure.Files;
 using MediaDownloader.Runners;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +20,6 @@ public class VideoAndAudioDownloader
     @"^(?<videoCodec>\S+(?:\s+only)?)(?:\s+(?<videoBitrate>\d+(?:[.,]\d+)?[kKmMgG]?))?\s+(?<audioCodec>\S+(?:\s+only)?)(?:\s+(?<audioBitrate>\d+(?:[.,]\d+)?[kKmMgG]?))?",
     RegexOptions.Compiled);
   private readonly YtdlpController _downloader;
-  private readonly string[] NecessaryArguments = new[] { "-q", "-o", "-", "--js-runtime", "node" };
   private readonly ILogger<VideoAndAudioDownloader> _logger;
 
   public VideoAndAudioDownloader(ILogger<VideoAndAudioDownloader> logger, YtdlpController downloader)
@@ -33,6 +33,7 @@ public class VideoAndAudioDownloader
     var metadataPayload = await _downloader.RunAsync(arguments: new[] {
       "-q", "--skip-download", "--list-formats", link });
     var rows = metadataPayload.StandardOutput.Trim().Split('\n').Skip(2);
+
     var result = new List<StreamInfo>();
     foreach (string row in rows.Where(row => !string.IsNullOrWhiteSpace(row)))
     {
@@ -47,17 +48,20 @@ public class VideoAndAudioDownloader
       var totalMeta = TotalMetaRegex.Match(sections[1]);
       var codecMeta = CodecMetaRegex.Match(sections[2]);
       if (!fileData.Success || !codecMeta.Success ||
-          !Enum.TryParse<EVideoExtension>(fileData.Groups["extension"].Value, true, out var extension))
+          !Enum.TryParse<EExtension>(fileData.Groups["extension"].Value, true, out var extension))
       {
         _logger.LogWarning("Skipping an unrecognized format row: {Row}", row);
         continue;
       }
 
+      var resolution = fileData.Groups["resolution"].Value;
+      if (resolution.Equals("unknown")) continue;
+
       result.Add(new StreamInfo
       {
         Id = fileData.Groups["id"].Value,
-        VideoExtension = extension,
-        Resolution = fileData.Groups["resolution"].Value,
+        Extension = extension,
+        Resolution = resolution,
         TotalBitrate = totalMeta.Success ? ParseBitrate(totalMeta.Groups["bitrate"].Value) : null,
         VideoCodec = codecMeta.Groups["videoCodec"].Value,
         VideoBitrate = ParseBitrate(codecMeta.Groups["videoBitrate"].Value),
@@ -86,82 +90,49 @@ public class VideoAndAudioDownloader
     };
   }
 
-  public async Task<MediaMetadata> GetMediaMetadataAsync(string link, string format)
+  public async Task<MediaMetadata> GetMediaMetadataAsync(string link, EExtension format, EResolution? resolution = null)
   {
     var metadataPayload = await _downloader.RunAsync(arguments: new[] {
       "--skip-download", "--print", "%(title)s|%(uploader)s|%(duration)s|%(filesize,filesize_approx)s", link });
     var metadataParts = metadataPayload.StandardOutput.Trim().Split('|');
+
+    _logger.LogInformation($"Incoming metadata: {string.Join(", ", metadataParts)}");
+
+    long fileSize;
+    int durationSec;
 
     return new MediaMetadata
     {
       Title = metadataParts[0],
       Author = metadataParts[1],
       FullName = $"{metadataParts[0]}.{format.ToString().ToLower()}",
-      FileSize = long.Parse(metadataParts[3]),
-      DurationSec = int.Parse(metadataParts[2])
-    };
-  }
-
-  public async Task<VideoFile> GetVideoAsync(string link, EVideoResolution resolution, EVideoExtension format)
-  {
-    string[] streamParams = ["-S", $"res:{(int)resolution}", link, "--remux-video", format.ToString().ToLower()];
-    var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
-
-    var metadata = await GetMediaMetadataAsync(link, format.ToString());
-
-    return new VideoFile
-    {
-      Metadata = metadata,
-      Extension = format,
-      Content = videoBytes,
+      FileSize =  long.TryParse(metadataParts[3], out fileSize) ? fileSize : null,
+      DurationSec = int.TryParse(metadataParts[2], out durationSec) ? durationSec : null,
       Resolution = resolution,
+      Extension = format
     };
   }
 
-  public async Task<VideoFile> GetVideoByIdAsync(string link, string id, EVideoResolution resolution, EVideoExtension format)
+  public async Task<TempFile> GetVideoByIdAsync(string link, string id, EResolution resolution, EExtension format)
   {
     string[] streamParams = ["-f", $"{id}+bestaudio", link, "--remux-video", format.ToString().ToLower()];
-
-    var videoBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
-
-    var metadata = await GetMediaMetadataAsync(link, format.ToString());
-
-    return new VideoFile
-    {
-      Metadata = metadata,
-      Extension = format,
-      Content = videoBytes,
-      Resolution = resolution,
-    };
+    var metadata = await GetMediaMetadataAsync(link: link, format: format, resolution: resolution);
+    return await GenerateFile(streamParams, metadata);
   }
 
-  public async Task<AudioFile> GetAudioAsync(string link, EAudioExtension format)
-  {
-    string[] streamParams = ["-f", format.ToString().ToLower(), link];
-    var audioBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
-
-    var metadata = await GetMediaMetadataAsync(link, format.ToString());
-
-    return new AudioFile
-    {
-      Metadata = metadata,
-      Extension = format,
-      Content = audioBytes,
-    };
-  }
-
-  public async Task<AudioFile> GetAudioByIdAsync(string link, string id, EAudioExtension format)
+  public async Task<TempFile> GetAudioByIdAsync(string link, string id, EExtension format)
   {
     string[] streamParams = ["-f", id, link];
-    var audioBytes = await _downloader.RunBytesAsync(arguments: NecessaryArguments.Concat(streamParams).ToArray());
+    var metadata = await GetMediaMetadataAsync(link, format);
+    return await GenerateFile(streamParams, metadata);
+  }
 
-    var metadata = await GetMediaMetadataAsync(link, format.ToString());
-
-    return new AudioFile
-    {
-      Metadata = metadata,
-      Extension = format,
-      Content = audioBytes,
-    };
+  private async Task<TempFile> GenerateFile(string[] streamParams, MediaMetadata metadata)
+  {
+    var path = Path.GetTempPath();
+    var fullPath = $"{path}/{metadata.FullName}";
+    var args = ArgumentFactory.GetArguments(fullPath);
+    await _downloader.RunBytesAsync(arguments: args.Concat(streamParams).ToArray());
+    return new TempFile(fullPath, metadata);
   }
 }

@@ -3,7 +3,7 @@ import { loadTranslations, type Locale, type Translations } from './locales'
 
 type StreamInfo = {
   id: string
-  videoExtension: string
+  extension: string
   resolution: string
   audioCodec: string
   videoCodec: string
@@ -123,8 +123,9 @@ export default function Home({ initialTranslations }: HomeProps) {
       const parameters = new URLSearchParams({
         link,
         id: selectedStream.id,
-        format: selectedStream.videoExtension,
+        format: selectedStream.extension,
       })
+      console.log(parameters)
       const endpoint = isAudioStream(selectedStream) ? 'audio_by_id' : 'video_by_id'
 
       if (endpoint === 'video_by_id') {
@@ -138,7 +139,8 @@ export default function Home({ initialTranslations }: HomeProps) {
       }
 
       const blob = await response.blob()
-      setFileName(getFileName(response.headers.get('content-disposition'), `media.${selectedStream.videoExtension.toLowerCase()}`))
+      console.log(response.headers.get('content-disposition'))
+      setFileName(getFileName(response.headers.get('content-disposition'), `media.${selectedStream.extension.toLowerCase()}`))
       setDownloadUrl(URL.createObjectURL(blob))
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : t.requestError)
@@ -180,7 +182,7 @@ export default function Home({ initialTranslations }: HomeProps) {
                 const selected = selectedStream?.id === stream.id
                 const details = [
                   stream.resolution.trim(),
-                  stream.videoExtension.toUpperCase(),
+                  stream.extension.toUpperCase(),
                   getBitrateLabel(stream.totalBitrate),
                   !isAudioStream(stream) ? stream.videoCodec : stream.audioCodec,
                 ].filter((value): value is string => Boolean(value))

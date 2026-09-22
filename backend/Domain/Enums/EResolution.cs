@@ -1,6 +1,6 @@
 namespace MediaDownloader.Domain.Enums;
 
-public enum EVideoResolution
+public enum EResolution
 {
   P144 = 144,
   P240 = 240,

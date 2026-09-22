@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using MediaDownloader.Application;
 using MediaDownloader.Runners;
+using Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +22,10 @@ builder.Services.AddCors(options =>
     "http://localhost:5003",
     "http://127.0.0.1:5003",
     "http://localhost:5000",
-    "http://127.0.0.1:5000"));
+    "http://127.0.0.1:5000")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .WithExposedHeaders("Content-Disposition"));
 });
 
 builder.Services.AddScoped<VideoAndAudioDownloader>();
@@ -31,6 +35,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
   app.MapOpenApi();
+  app.UseMiddleware<RequestLoggingMiddleware>();
 }
 
 app.UseDefaultFiles();

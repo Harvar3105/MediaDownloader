@@ -1,3 +1,5 @@
+using MediaDownloader.Domain.Enums;
+
 namespace MediaDownloader.Domain.Classes;
 
 public class MediaMetadata
@@ -6,5 +8,7 @@ public class MediaMetadata
   public required string FullName { get; set; }
   public string? Author { get; set; }
   public long? FileSize { get; set; }
-  public int DurationSec { get; set; }
+  public int? DurationSec { get; set; }
+  public EResolution? Resolution {get; set;}
+  public EExtension Extension {get; set;}
 }

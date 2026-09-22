@@ -17,34 +17,6 @@ public class VideoAndAudioController : ControllerBase
     _logger = logger;
   }
 
-  [HttpGet("video")]
-  public async Task<IActionResult> GetVideo(string link, EVideoResolution resolution = EVideoResolution.P720, EVideoExtension format = EVideoExtension.Mp4)
-  {
-    try
-    {
-      var video = await _downloader.GetVideoAsync(link, resolution, format);
-      return File(video.Content, "application/octet-stream", video.Metadata.FullName);
-    }
-    catch (Exception ex)
-    {
-      return BadRequest(ex.Message);
-    }
-  }
-
-  [HttpGet("audio")]
-  public async Task<IActionResult> GetAudio(string link, EAudioExtension format = EAudioExtension.Mp3)
-  {
-    try
-    {
-      var audio = await _downloader.GetAudioAsync(link, format);
-      return File(audio.Content, "application/octet-stream", audio.Metadata.FullName);
-    }
-    catch (Exception ex)
-    {
-      return BadRequest(ex.Message);
-    }
-  }
-
   [HttpGet("streams_info")]
   public async Task<IActionResult> GetStreamsInfo(string link)
   {
@@ -55,13 +27,13 @@ public class VideoAndAudioController : ControllerBase
     }
     catch (Exception ex)
     {
-      _logger.LogError($"Error getting streams info: {ex.Message}");
+      _logger.LogError(ex, $"Error getting streams info: {ex.Message}");
       return BadRequest(ex.Message);
     }
   }
 
   [HttpGet("get_mdedia_metadata")]
-  public async Task<IActionResult> GetMediaMetadata(string link, string format)
+  public async Task<IActionResult> GetMediaMetadata(string link, EExtension format)
   {
     try
     {
@@ -70,35 +42,55 @@ public class VideoAndAudioController : ControllerBase
     }
     catch (Exception ex)
     {
-      _logger.LogError($"Error getting media metadata: {ex.Message}");
+      _logger.LogError(ex, $"Error getting media metadata: {ex.Message}");
       return BadRequest(ex.Message);
     }
   }
 
   [HttpGet("video_by_id")]
-  public async Task<IActionResult> GetVideoById(string link, string id, EVideoResolution resolution, EVideoExtension format)
+  public async Task<IActionResult> GetVideoById(string link, string id, EResolution resolution = EResolution.P144, EExtension format = EExtension.Mp4)
   {
     try
     {
       var video = await _downloader.GetVideoByIdAsync(link, id, resolution, format);
-      return File(video.Content, "application/octet-stream", video.Metadata.FullName);
+
+      HttpContext.Response.OnCompleted(() =>
+        {
+          video.Delete();
+          return Task.CompletedTask;
+        });
+
+      var stream = video.OpenRead();
+
+      return File(stream, $"video/{format}", video._metadata.FullName);
     }
     catch (Exception ex)
     {
+      _logger.LogError(ex, "Failedto get the video by id: " + ex.Message);
       return BadRequest(ex.Message);
     }
   }
 
   [HttpGet("audio_by_id")]
-  public async Task<IActionResult> GetAudioById(string link, string id, EAudioExtension format)
+  public async Task<IActionResult> GetAudioById(string link, string id, EExtension format = EExtension.Mp3)
   {
     try
     {
       var audio = await _downloader.GetAudioByIdAsync(link, id, format);
-      return File(audio.Content, "application/octet-stream", audio.Metadata.FullName);
+
+      HttpContext.Response.OnCompleted(() =>
+        {
+          audio.Delete();
+          return Task.CompletedTask;
+        });
+    
+      var stream = audio.OpenRead();
+
+      return File(stream, $"audio/{format}", audio._metadata.FullName);
     }
     catch (Exception ex)
     {
+      _logger.LogError(ex, "Failedto get the audio by id: " + ex.Message);
       return BadRequest(ex.Message);
     }
   }
